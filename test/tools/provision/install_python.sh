@@ -5,5 +5,5 @@ if [ ! ${CODE_DIR} ]; then
      echo "CODE_DIR variable is not defined"
      exit 1
 else
-     sudo pip3 install -r $CODE_DIR/requirements/dev.txt
+     sudo pip3 install -r $CODE_DIR/test/requirements/dev.txt
 fi

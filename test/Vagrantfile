@@ -68,12 +68,12 @@ Vagrant.configure(2) do |config|
    config.vm.provision "shell", inline: <<-SHELL
      export CODE_DIR=/src
      echo 'export CODE_DIR=/src' >  ~/.bashrc
-     sudo chmod 777 /src/tools/provision/bootstrap.sh
-     sudo chmod 777 /src/tools/provision/install_postgresql.sh
-     sudo chmod 777 /src/tools/provision/install_python.sh
-     sudo /src/tools/provision/bootstrap.sh
-     /src/tools/provision/install_postgresql.sh
-     /src/tools/provision/install_python.sh
+     sudo chmod 777 /src/test//tools/provision/bootstrap.sh
+     sudo chmod 777 /src/test/tools/provision/install_postgresql.sh
+     sudo chmod 777 /src/test/tools/provision/install_python.sh
+     sudo /src/test/tools/provision/bootstrap.sh
+     /src/test/tools/provision/install_postgresql.sh
+     /src/test/tools/provision/install_python.sh
    SHELL
   # config.vm.provision :shell, :path => "/src/tools/provision/bootstrap.sh"
 end

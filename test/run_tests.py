@@ -12,7 +12,8 @@ sys.path.append(os.path.join(BASE_DIR, '../'))
 def run_tests():
     from pgsqlutils import get_db_conf
     conf = get_db_conf()
-    print(conf)
+    conf.a = 'holaaaaaaaaaaaaaaaaaaaaaaaa'
+    #print(conf)
     pytest.main()
 
 def main():
