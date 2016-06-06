@@ -1,21 +1,46 @@
-from pgsqlutils import get_db_conf
+from pgsqlutils.base import get_db_conf, DBConnection
+from .models import Artist
 
-class TestClass:
+
+class TestConfig(object):
 
     def test_db_conf(self):
         """
-        Test
+        Check that all instances of config have same configuration
+        values
         """
         conf = get_db_conf()
-        assert hasattr(conf, 'hello') == False 
+        assert hasattr(conf, 'DATABASE_URI') == False
+        conf.DATABASE_URI = 'postgresql://ds:dsps@localhost:5432/ds'
+        conf2 = get_db_conf()
+        assert hasattr(conf2, 'DATABASE_URI')
+        assert conf.DATABASE_URI == conf2.DATABASE_URI
 
-    def test_one(self):
-        conf = get_db_conf()
-        print(conf)
-        x = "this"
-        #assert 'h' in x
-        assert conf.a == 'holaaaaaaaaaaaaaaaaaaaaaaaa'
 
-    def test_two(self):
-        x = "hello"
-        #assert hasattr(x, 'hello')
+class TestDB(object):
+    def setup(self):
+        self.conf = get_db_conf()
+        self.conf.DATABASE_URI = 'postgresql://ds:dsps@localhost:5432/ds'
+
+    def test_connection_open(self):
+        """
+        checks if connection is open
+        """
+        conn = DBConnection()
+        result = conn.session.execute('SELECT 19;')
+        assert result.fetchone()[0] == 19
+        conn.close()
+
+
+class TestCaseModel(object):
+    def setup(self):
+        self.conf = get_db_conf()
+        self.conf.DATABASE_URI = 'postgresql://ds:dsps@localhost:5432/ds'
+        self.conn = DBConnection()
+
+    def test_simple_insert(self):
+        print('a')
+
+    def teardown(self):
+        self.conn.rollback()
+        self.conn.close()

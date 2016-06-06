@@ -13,3 +13,16 @@ We are willing to hear about your suggestions and improvements
 Talk at pycon about building fundational database code base https://www.youtube.com/watch?v=5SSC6nU314c
 
 Source code from this talk is being used in this project, original repository can be found at https://bitbucket.org/zzzeek/pycon2014_atmcraft
+
+## Executing test
+
+In order to run test, a postgresql database is required, easiest way to provide a postgresql installation is by using a vagrant
+instance, below steps required to execute unit tests:
+
+```
+   cd test
+   vagrant up
+   vagrant ssh
+   cd /src/test
+   python3 run_test.py
+```

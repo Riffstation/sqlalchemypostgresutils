@@ -1,24 +1,83 @@
-from sqlalchemy.ext.declarative import declarative_base
+from .base import Base, DBConnection
+from .schema import SurrogatePK
 
-Base = declarative_base()
+class BaseManager(object):
+    """
+    Base manager, every model will have this common manager
+    that allows us to perform database common operations
+    """
+    def __init__(self, model, session):
+        self._model = model
+        self.session = session
+
+    def filter_by(self, order_by='id', limit=500, offset=0, **kwargs):
+        return self.session.query(
+            self._model
+            ).filter_by(
+                **kwargs
+            ).order_by(order_by).limit(limit).offset(offset)
+
+    def get(self, id):
+        return self.session.query(self._model).get(id)
+
+    def get_authentication(self, user_id):
+        try:
+            return self.session.query(
+                self._model).filter_by(user_id=user_id).one()
+        except exc.SQLAlchemyError:
+            return None
+
+    def get_usersongs(self, user_id):
+        try:
+            return self.session.query(
+                self._model).filter_by(user_id=user_id).all()
+        except exc.SQLAlchemyError:
+            return None
+
+    def get_usersong_count(self, user_id):
+        try:
+            return self.session.query(
+                self._model).filter_by(user_id=user_id).count()
+        except exc.SQLAlchemyError:
+            return None
+
+    def count(self):
+        result = self.session.execute(
+            'SELECT count(id) from {}'.format(self._model.__table__.name)
+        )
+        r = result.fetchone()
+        if len(r) > 0:
+            return r[0]
+        else:
+            return 0
+
+    def all(self):
+        results = self.session.query(self._model).order_by('id').all()
+        data_array = []
+        for result in results:
+            # remove unnecessary k/v pair that is not JSON serializable
+            result.__dict__.pop('_sa_instance_state', None)
+            data_array.append(result.__dict__)
+        return data_array
 
 
-class BaseModel(Base):
-    """Abstract base model, contiains common field and methods for all models
+
+
+class BaseModel(Base, SurrogatePK):
+    """Abstract base model, contains common field and methods for all models
     """
     __abstract__ = True
 
     def __init__(self, **kwargs):
-        dbconf = get_db_conf()
-        self.session = get_session(dbconf.SQLALCHEMY_DATABASE_URI)
+        self._conn = DBConnection()
         for name, value in kwargs.items():
-            setattr(self, name, value)
+            if not name.startswith('_'):
+                setattr(self, name, value)
 
     def close_session(self):
         if self.session:
             self.session.close_all()
 
-    id = Column(Integer, primary_key=True)
 
     @classmethod
     def objects(cls):
