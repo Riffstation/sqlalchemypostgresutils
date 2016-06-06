@@ -24,8 +24,8 @@ class DBConnection(object):
     http://docs.sqlalchemy.org/en/latest/core/connections.html
     """
     def __init__(self):
-        engine = create_engine(conf.DATABASE_URI)
-        self.conn = engine.connect()
+        self._engine = create_engine(conf.DATABASE_URI)
+        self.conn = self._engine.connect()
         self.transaction = self.conn.begin()
         sm = sessionmaker(bind=self.conn)
         self.session = scoped_session(sm)
@@ -37,6 +37,11 @@ class DBConnection(object):
         self.session.close()
         self.conn.close()
 
+    def syncdb(self):
+        """
+        Create tables if they don't exist
+        """
+        Base.metadata.create_all(self._engine)
 
 class Base(References):
     pass

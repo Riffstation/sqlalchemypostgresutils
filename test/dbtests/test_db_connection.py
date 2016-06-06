@@ -1,4 +1,5 @@
 from pgsqlutils.base import get_db_conf, DBConnection
+from pgsqlutils.orm import BaseModel
 from .models import Artist
 
 
@@ -37,6 +38,7 @@ class TestCaseModel(object):
         self.conf = get_db_conf()
         self.conf.DATABASE_URI = 'postgresql://ds:dsps@localhost:5432/ds'
         self.conn = DBConnection()
+        self.conn.syncdb()
 
     def test_simple_insert(self):
         print('a')
