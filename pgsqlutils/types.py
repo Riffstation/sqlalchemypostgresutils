@@ -50,6 +50,7 @@ class BcryptType(TypeDecorator):
     def __repr__(self):
         return "BcryptType()"
 
+
 class GUID(TypeDecorator):
     """Platform-independent GUID type.
 
