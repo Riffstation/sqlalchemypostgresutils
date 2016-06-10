@@ -1,5 +1,5 @@
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.ext.declarative import declarative_base, declared_attr
 from sqlalchemy.orm import sessionmaker, scoped_session
 from .schema import References
 
@@ -19,29 +19,29 @@ def get_db_conf():
     return conf
 
 
-class DBConnection(object):
+engine = None
+
+Session = scoped_session(sessionmaker())
+
+
+def init_db_conn():
     """
-    http://docs.sqlalchemy.org/en/latest/core/connections.html
+    Engine and session maker should be global, so there will be attached
+    to Borg configuration object
     """
-    def __init__(self):
-        self._engine = create_engine(conf.DATABASE_URI)
-        self.conn = self._engine.connect()
-        self.transaction = self.conn.begin()
-        sm = sessionmaker(bind=self.conn)
-        self.session = scoped_session(sm)
+    conf = get_db_conf()
+    global engine
+    engine = create_engine(conf.DATABASE_URI)
+    Session.configure(bind=engine)
 
-    def rollback(self):
-        self.transaction.rollback()
 
-    def close(self):
-        self.session.close()
-        self.conn.close()
 
-    def syncdb(self):
-        """
-        Create tables if they don't exist
-        """
-        Base.metadata.create_all(self._engine)
+def syncdb():
+    """
+    Create tables if they don't exist
+    """
+    Base.metadata.create_all(engine)
+
 
 class Base(References):
     pass

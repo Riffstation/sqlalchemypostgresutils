@@ -5,7 +5,6 @@ from sqlalchemy.dialects.postgresql import UUID
 import uuid
 import bcrypt
 
-Amount = Numeric(8, 2)
 
 class Password(str):
     """Coerce a string to a bcrypt password.
@@ -33,6 +32,7 @@ class Password(str):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
 
 class BcryptType(TypeDecorator):
     """Coerce strings to bcrypted Password objects for the database.
@@ -87,4 +87,3 @@ class GUID(TypeDecorator):
             return value
         else:
             return uuid.UUID(value)
-

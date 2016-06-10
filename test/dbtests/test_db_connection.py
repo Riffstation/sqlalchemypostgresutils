@@ -1,4 +1,4 @@
-from pgsqlutils.base import get_db_conf, DBConnection
+from pgsqlutils.base import get_db_conf, init_db_conn, syncdb, Session
 from pgsqlutils.orm import BaseModel
 from .models import Artist
 
@@ -22,27 +22,33 @@ class TestDB(object):
     def setup(self):
         self.conf = get_db_conf()
         self.conf.DATABASE_URI = 'postgresql://ds:dsps@localhost:5432/ds'
+        init_db_conn()
 
     def test_connection_open(self):
         """
         checks if connection is open
         """
-        conn = DBConnection()
-        result = conn.session.execute('SELECT 19;')
+        result = Session.execute('SELECT 19;')
         assert result.fetchone()[0] == 19
-        conn.close()
+        Session.close()
 
 
 class TestCaseModel(object):
     def setup(self):
         self.conf = get_db_conf()
         self.conf.DATABASE_URI = 'postgresql://ds:dsps@localhost:5432/ds'
-        self.conn = DBConnection()
-        self.conn.syncdb()
+        syncdb()
 
     def test_simple_insert(self):
-        print('a')
+        assert 0 == Artist.objects.count()
+        artist = Artist()
+        artist.add()
+        assert 1 == Artist.objects.count()
+        artist2 = Artist()
+        artist2.add()
+        assert 2 == Artist.objects.count()
+
 
     def teardown(self):
-        self.conn.rollback()
-        self.conn.close()
+        Session.rollback()
+        Session.close()

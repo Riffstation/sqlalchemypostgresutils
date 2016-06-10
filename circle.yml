@@ -1,0 +1,12 @@
+machine:
+  python:
+    version: 3.4.3
+
+dependencies:
+    pre:
+        - pip3 install psycopg2  SQLAlchemy python3-flake8
+        - npm install jscs -g
+test:
+    override:
+        -  flake8 ./
+        -  python3 test/run_tests.py
