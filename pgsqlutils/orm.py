@@ -1,6 +1,37 @@
-from .base import get_db_conf, Base, Session
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.orm import relationship
+
+from .base import Base, Session
 from .schema import SurrogatePK
+
+
+def many_to_one(clsname, **kw):
+    """Use an event to build a many-to-one relationship on a class.
+
+    This makes use of the :meth:`.References._reference_table` method
+    to generate a full foreign key relationship to the remote table.
+
+    """
+    @declared_attr
+    def m2o(cls):
+        cls._references((cls.__name__, clsname))
+        return relationship(clsname, **kw)
+    return m2o
+
+
+def one_to_many(clsname, **kw):
+    """Use an event to build a one-to-many relationship on a class.
+
+    This makes use of the :meth:`.References._reference_table` method
+    to generate a full foreign key relationship from the remote table.
+
+    """
+    @declared_attr
+    def o2m(cls):
+        cls._references((clsname, cls.__name__))
+        return relationship(clsname, **kw)
+    return o2m
+
 
 class BaseManager(object):
     """
@@ -11,15 +42,14 @@ class BaseManager(object):
         self._model = model
 
     def filter_by(self, order_by='id', limit=500, offset=0, **kwargs):
-        return self.session.query(
+        return Session.query(
             self._model
             ).filter_by(
                 **kwargs
             ).order_by(order_by).limit(limit).offset(offset)
 
     def get(self, id):
-        return self.session.query(self._model).get(id)
-
+        return Session.query(self._model).get(id)
 
     def count(self):
         result = Session.execute(
@@ -53,27 +83,12 @@ class BaseModel(Base, SurrogatePK):
         return Session.execute(sql, kwargs)
 
     def update(self):
-        dbconf = get_db_conf()
-        try:
-            if not hasattr(self, 'session'):
-                self.session = get_session(dbconf.SQLALCHEMY_DATABASE_URI)
-            self.session.commit()
-        except Exception as error:
-            self.session.rollback()
-            raise error
+        Session.flush()
 
     def add(self):
         Session.add(self)
         Session.flush()
 
     def delete(self):
-        try:
-            if not hasattr(self, 'session'):
-                dbconf = get_db_conf()
-                self.session = get_session(dbconf.SQLALCHEMY_DATABASE_URI)
-
-            self.session.delete(self)
-            self.session.commit()
-        except Exception as error:
-            self.session.rollback()
-            raise error
+        Session.delete(self)
+        Session.flush()

@@ -48,6 +48,9 @@ class TestCaseModel(object):
         artist2.add()
         assert 2 == Artist.objects.count()
 
+    def test_simple_many_to_one_key(self):
+        pass
+
 
     def teardown(self):
         Session.rollback()
