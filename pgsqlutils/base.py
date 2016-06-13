@@ -3,16 +3,20 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
 
 # Alex Martelli's 'Borg'
+
+
 class DBBorg:
     _shared_state = {}
 
     def __init__(self):
         self.__dict__ = self._shared_state
 
+
 class DBConf(DBBorg):
     pass
 
 conf = DBConf()
+
 
 def get_db_conf():
     return conf
@@ -22,8 +26,6 @@ engine = None
 
 Session = scoped_session(sessionmaker())
 
-def get_engine():
-    return engine
 
 def init_db_conn():
     """
@@ -36,7 +38,6 @@ def init_db_conn():
     Session.configure(bind=engine)
 
 
-
 def syncdb():
     """
     Create tables if they don't exist
@@ -47,7 +48,7 @@ def syncdb():
 Base = declarative_base()
 
 # establish a constraint naming convention.
-# see http://docs.sqlalchemy.org/en/latest/core/constraints.html#configuring-constraint-naming-conventions
+# see http://docs.sqlalchemy.org/en/latest/core/constraints.html#configuring-constraint-naming-conventions # noqa
 #
 Base.metadata.naming_convention = {
     "pk": "pk_%(table_name)s",

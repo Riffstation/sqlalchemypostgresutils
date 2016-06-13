@@ -1,4 +1,4 @@
-from sqlalchemy import String, Numeric, Integer
+from sqlalchemy import String
 from sqlalchemy.types import TypeDecorator, CHAR
 from sqlalchemy.dialects.postgresql import UUID
 

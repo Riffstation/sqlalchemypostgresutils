@@ -59,13 +59,10 @@ class TestCaseModel(object):
             description='Interesting')
         dark.add()
 
-        assert 1 == len(rock.artists)
-
         rolling = Artist(
             genre_id=rock.id, name='Rolling Stones', description='Acceptable')
 
         rolling.add()
-
 
         hits = Album(
             artist_id=rolling.id, name='Greatest hits',
@@ -78,10 +75,8 @@ class TestCaseModel(object):
             artist_id=pink.id, name='The Wall',
             description='Interesting')
         wall.add()
-
         assert 2 == len(pink.albums)
-        assert 2 == len(Genre.objects.get(rock.id).artists)
-
+        assert 2 == len(Artist.objects.filter_by(genre_id=rock.id)[:])
 
     def teardown(self):
         Session.rollback()

@@ -34,7 +34,6 @@ class BaseManager(object):
             return 0
 
 
-
 class BaseModel(Base):
     """Abstract base model, contains common field and methods for all models
     """

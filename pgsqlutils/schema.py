@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Table, DateTime, Integer
+from sqlalchemy import Column, Table, DateTime
 from sqlalchemy import event
 from sqlalchemy.sql import functions
 from sqlalchemy.ext.compiler import compiles
@@ -20,6 +20,7 @@ def _default_utcnow(element, compiler, **kw):
     """
     return "utcnow()"
 
+
 @compiles(utcnow, 'postgresql')
 def _pg_utcnow(element, compiler, **kw):
     """Postgresql-specific compilation handler."""
@@ -33,13 +34,13 @@ def timestamp_cols(table, metadata):
 
     if metadata is Base.metadata:
         table.append_column(
-            Column('created_at',
-                        DateTime(timezone=True),
-                        nullable=False, default=utcnow())
+            Column(
+                'created_at', DateTime(timezone=True),
+                nullable=False, default=utcnow())
         )
+
         table.append_column(
-            Column('updated_at',
-                        DateTime(timezone=True),
-                        nullable=False,
-                        default=utcnow(), onupdate=utcnow())
+            Column(
+                'updated_at', DateTime(timezone=True), nullable=False,
+                default=utcnow(), onupdate=utcnow())
         )
