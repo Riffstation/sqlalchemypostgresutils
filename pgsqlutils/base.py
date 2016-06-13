@@ -1,7 +1,6 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, scoped_session
-from .schema import References
 
 # Alex Martelli's 'Borg'
 class DBBorg:
@@ -23,6 +22,8 @@ engine = None
 
 Session = scoped_session(sessionmaker())
 
+def get_engine():
+    return engine
 
 def init_db_conn():
     """
@@ -43,10 +44,7 @@ def syncdb():
     Base.metadata.create_all(engine)
 
 
-class Base(References):
-    pass
-
-Base = declarative_base(cls=Base)
+Base = declarative_base()
 
 # establish a constraint naming convention.
 # see http://docs.sqlalchemy.org/en/latest/core/constraints.html#configuring-constraint-naming-conventions

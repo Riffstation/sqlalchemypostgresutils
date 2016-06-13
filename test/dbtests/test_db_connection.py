@@ -1,6 +1,5 @@
 from pgsqlutils.base import get_db_conf, init_db_conn, syncdb, Session
-from pgsqlutils.orm import BaseModel
-from .models import Artist
+from .models import Artist, Album, Genre
 
 
 class TestConfig(object):
@@ -40,6 +39,7 @@ class TestCaseModel(object):
         syncdb()
 
     def test_simple_insert(self):
+        syncdb()
         assert 0 == Artist.objects.count()
         artist = Artist()
         artist.add()
@@ -48,8 +48,39 @@ class TestCaseModel(object):
         artist2.add()
         assert 2 == Artist.objects.count()
 
-    def test_simple_many_to_one_key(self):
-        pass
+    def test_relationships(self):
+        rock = Genre(name='Rock', description='rock yeah!!!')
+        rock.add()
+        pink = Artist(
+            genre_id=rock.id, name='Pink Floyd', description='Awsome')
+        pink.add()
+        dark = Album(
+            artist_id=pink.id, name='Dark side of the moon',
+            description='Interesting')
+        dark.add()
+
+        assert 1 == len(rock.artists)
+
+        rolling = Artist(
+            genre_id=rock.id, name='Rolling Stones', description='Acceptable')
+
+        rolling.add()
+
+
+        hits = Album(
+            artist_id=rolling.id, name='Greatest hits',
+            description='Interesting')
+        hits.add()
+
+        assert 2 == Album.objects.count()
+
+        wall = Album(
+            artist_id=pink.id, name='The Wall',
+            description='Interesting')
+        wall.add()
+
+        assert 2 == len(pink.albums)
+        assert 2 == len(Genre.objects.get(rock.id).artists)
 
 
     def teardown(self):
