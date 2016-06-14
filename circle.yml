@@ -4,9 +4,9 @@ machine:
 
 dependencies:
     pre:
-        - pip3 install psycopg2  SQLAlchemy python3-flake8
+        - pip3 install psycopg2  SQLAlchemy python-flake8
         - npm install jscs -g
 test:
     override:
         -  flake8 ./
-        -  python3 test/run_tests.py
+        -  python3 test/run_tests.py --config test/config/ci.json

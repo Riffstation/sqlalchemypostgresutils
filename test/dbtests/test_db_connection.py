@@ -1,26 +1,9 @@
-from pgsqlutils.base import get_db_conf, init_db_conn, syncdb, Session
+from pgsqlutils.base import init_db_conn, syncdb, Session
 from .models import Artist, Album, Genre
-
-
-class TestConfig(object):
-
-    def test_db_conf(self):
-        """
-        Check that all instances of config have same configuration
-        values
-        """
-        conf = get_db_conf()
-        assert hasattr(conf, 'DATABASE_URI') == False
-        conf.DATABASE_URI = 'postgresql://ds:dsps@localhost:5432/ds'
-        conf2 = get_db_conf()
-        assert hasattr(conf2, 'DATABASE_URI')
-        assert conf.DATABASE_URI == conf2.DATABASE_URI
 
 
 class TestDB(object):
     def setup(self):
-        self.conf = get_db_conf()
-        self.conf.DATABASE_URI = 'postgresql://ds:dsps@localhost:5432/ds'
         init_db_conn()
 
     def test_connection_open(self):
@@ -34,8 +17,6 @@ class TestDB(object):
 
 class TestCaseModel(object):
     def setup(self):
-        self.conf = get_db_conf()
-        self.conf.DATABASE_URI = 'postgresql://ds:dsps@localhost:5432/ds'
         syncdb()
 
     def test_simple_insert(self):
