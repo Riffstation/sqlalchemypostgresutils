@@ -4,7 +4,7 @@ machine:
 
 dependencies:
     pre:
-        - pip3 install psycopg2  SQLAlchemy flake8
+        - pip3 install psycopg2  SQLAlchemy flake8 pytest
         - npm install jscs -g
 test:
     override:
