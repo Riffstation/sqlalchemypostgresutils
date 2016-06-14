@@ -59,6 +59,63 @@ class TestCaseModel(object):
         assert 2 == len(pink.albums)
         assert 2 == len(Artist.objects.filter_by(genre_id=rock.id)[:])
 
+    def test_update(self):
+        rock = Genre(name='Rock', description='rock yeah!!!')
+        rock.add()
+        description_updated = 'description_updated'
+        rock.description = description_updated
+        rock.update()
+        rock2 = Genre.objects.get(rock.id)
+        assert rock2.description == description_updated
+        assert 1 == Genre.objects.count()
+
+    def test_delete(self):
+        rock = Genre(name='Rock', description='rock yeah!!!')
+        rock.add()
+        assert 1 == Genre.objects.count()
+        rock.delete()
+        assert 0 == Genre.objects.count()
+
+    def test_raw_sql(self):
+        rock = Genre(name='Rock', description='rock yeah!!!')
+        rock.add()
+        pink = Artist(
+            genre_id=rock.id, name='Pink Floyd', description='Awsome')
+        pink.add()
+        dark = Album(
+            artist_id=pink.id, name='Dark side of the moon',
+            description='Interesting')
+        dark.add()
+        rolling = Artist(
+            genre_id=rock.id, name='Rolling Stones', description='Acceptable')
+
+        rolling.add()
+
+        sql = """
+            SELECT a.name as artist_name, a.description artist_description,
+            g.name as artist_genre
+            FROM artist a
+            INNER JOIN genre g ON a.genre_id = g.id
+            ORDER BY a.id DESC;
+        """
+
+        result = Genre.objects.raw_sql(sql).fetchall()
+        assert 2 == len(result)
+        assert 'Rolling Stones' == result[0][0]
+
+        sql = """
+            SELECT a.name as artist_name, a.description artist_description,
+            g.name as artist_genre
+            FROM artist a
+            INNER JOIN genre g ON a.genre_id = g.id
+            WHERE a.id = :artist_id
+            ORDER BY a.id DESC;
+        """
+
+        result = Genre.objects.raw_sql(sql, artist_id=pink.id).fetchall()
+        assert 1 == len(result)
+        assert 'Pink Floyd' == result[0][0]
+
     def teardown(self):
         Session.rollback()
         Session.close()

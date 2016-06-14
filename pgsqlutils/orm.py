@@ -1,5 +1,6 @@
 from sqlalchemy import Column, Integer
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.sql import text
 
 from .base import Base, Session
 
@@ -33,6 +34,9 @@ class BaseManager(object):
         else:
             return 0
 
+    def raw_sql(self, sql, **kwargs):
+        return Session.execute(text(sql), kwargs)
+
 
 class BaseModel(Base):
     """Abstract base model, contains common field and methods for all models
@@ -50,10 +54,6 @@ class BaseModel(Base):
     @declared_attr
     def objects(cls):
         return BaseManager(cls)
-
-    @classmethod
-    def raw_sql(cls, sql, **kwargs):
-        return Session.execute(sql, kwargs)
 
     def update(self):
         Session.flush()
