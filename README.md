@@ -26,7 +26,7 @@ is by using a vagrant instance, below steps required to execute unit tests:
 ## Usage
 
 
-### Connectino Configuration
+### Connection Configuration
 
 You need to specify  a [postgresql url before start using this library:] (http://docs.sqlalchemy.org/en/latest/core/engines.html#database-urls)
 
