@@ -24,7 +24,10 @@ def get_db_conf():
 
 engine = None
 
-Session = scoped_session(sessionmaker())
+if not hasattr(conf, 'Session'):
+    Session = scoped_session(sessionmaker())
+else:
+    Session = conf.Session
 
 
 def init_db_conn():
