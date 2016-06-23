@@ -1,5 +1,9 @@
 from pgsqlutils.base import init_db_conn, syncdb, Session
+from pgsqlutils.exceptions import NotFoundError
+
 from .models import Artist, Album, Genre
+
+import pytest
 
 
 class TestDB(object):
@@ -115,6 +119,11 @@ class TestCaseModel(object):
         result = Genre.objects.raw_sql(sql, artist_id=pink.id).fetchall()
         assert 1 == len(result)
         assert 'Pink Floyd' == result[0][0]
+
+    def test_not_found(self):
+        with pytest.raises(NotFoundError) as excinfo:
+            Genre.objects.get(-666)
+        assert "Object not found" in str(excinfo.value)
 
     def teardown(self):
         Session.rollback()
