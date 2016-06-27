@@ -45,13 +45,6 @@ def syncdb():
     Base.metadata.create_all(engine)
 
 
-def dropall():
-    """
-    Drop all database tables
-    """
-    Base.metadata.drop_all(engine)
-
-
 Base = declarative_base()
 
 # establish a constraint naming convention.
