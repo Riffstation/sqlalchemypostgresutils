@@ -1,4 +1,7 @@
 # sqlalchemypostgresutils
+
+[![CircleCI](https://circleci.com/gh/Riffstation/sqlalchemypostgresutils.svg?style=svg)](https://circleci.com/gh/Riffstation/sqlalchemypostgresutils)
+
 Simple library that uses  [SQLAlchemy](http://www.sqlalchemy.org/) to access postgresql databases.
 
 ## What this project is about?

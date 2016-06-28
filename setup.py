@@ -7,5 +7,6 @@ setup(
     author='Manuel Ignacio Franco Galeano',
     author_email='maigfrga@gmail.com',
     install_requires=[
+        'bcrypt',
         'SQLAlchemy>=1.0'],
 )

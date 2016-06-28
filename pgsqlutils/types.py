@@ -19,11 +19,10 @@ class Password(str):
     """
 
     def __new__(cls, value, salt=None, crypt=True):
-        if isinstance(value, unicode):  # noqa
-            value = value.encode('utf-8')
+        value = value.encode('utf-8')
         if crypt:
             value = bcrypt.hashpw(value, salt or bcrypt.gensalt(4))
-        return str.__new__(cls, value)
+        return value.decode('utf-8')
 
     def __eq__(self, other):
         if not isinstance(other, Password):

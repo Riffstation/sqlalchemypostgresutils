@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.sql import text
 
 from .base import Base, Session
+from .exceptions import NotFoundError
 
 
 class BaseManager(object):
@@ -21,7 +22,10 @@ class BaseManager(object):
             ).order_by(order_by).limit(limit).offset(offset)
 
     def get(self, id):
-        return Session.query(self._model).get(id)
+        obj = Session.query(self._model).get(id)
+        if not obj:
+            raise NotFoundError('Object not found')
+        return obj
 
     def count(self):
         result = Session.execute(
