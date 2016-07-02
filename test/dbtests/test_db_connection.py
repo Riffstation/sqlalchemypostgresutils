@@ -122,7 +122,7 @@ class TestCaseModel(object):
 
     def test_not_found(self):
         with pytest.raises(NotFoundError) as excinfo:
-            Genre.objects.get(-666)
+            Genre.objects.get(id=-666)
         assert "Object not found" in str(excinfo.value)
 
     def test_encrypted_password(self):
@@ -133,7 +133,7 @@ class TestCaseModel(object):
         # objects needs to dereferenciated otherwise
         # user2 will be just a copy of user
         user = None
-        user2 = User.objects.get(id)
+        user2 = User.objects.get(id=id)
         assert id == user2.id
         assert pwd != user2.password
 
