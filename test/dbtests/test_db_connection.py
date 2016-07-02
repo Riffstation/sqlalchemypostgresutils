@@ -69,7 +69,7 @@ class TestCaseModel(object):
         description_updated = 'description_updated'
         rock.description = description_updated
         rock.update()
-        rock2 = Genre.objects.get(rock.id)
+        rock2 = Genre.objects.get(id=rock.id)
         assert rock2.description == description_updated
         assert 1 == Genre.objects.count()
 
