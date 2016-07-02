@@ -137,6 +137,16 @@ class TestCaseModel(object):
         assert id == user2.id
         assert pwd != user2.password
 
+    def test_get_insert(self):
+        """
+        Testing password field
+        """
+        assert 0 == User.objects.count()
+        user = User(
+            username='username1', email='email1@email.com', password='123')
+        user.add()
+        assert 1 == User.objects.count()
+
     def teardown(self):
         Session.rollback()
         Session.close()

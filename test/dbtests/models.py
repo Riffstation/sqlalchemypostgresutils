@@ -31,3 +31,10 @@ class Genre(BaseModel):
     __tablename__ = 'genre'
     name = Column(String(256))
     description = Column(String(256))
+
+
+class User(BaseModel):
+    __tablename__ = 'users'
+    username = Column(String(64))
+    password = Column(BcryptType)
+    email = Column(String(64))
