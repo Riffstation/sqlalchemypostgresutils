@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.sql import text
 
 from .base import Base, Session
-from .exceptions import NotFoundError
+from .exceptions import NotFoundError, InvalidQueryError
 
 
 class BaseManager(object):
@@ -21,8 +21,12 @@ class BaseManager(object):
                 **kwargs
             ).order_by(order_by).limit(limit).offset(offset)
 
-    def get(self, id):
-        obj = Session.query(self._model).get(id)
+    def get(self, **kwargs):
+        if not kwargs:
+            raise InvalidQueryError(
+                "Can not execute a query without parameters")
+        obj = Session.query(self._model).filter_by(**kwargs).first()
+
         if not obj:
             raise NotFoundError('Object not found')
         return obj

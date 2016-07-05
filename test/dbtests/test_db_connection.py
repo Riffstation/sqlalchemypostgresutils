@@ -69,7 +69,7 @@ class TestCaseModel(object):
         description_updated = 'description_updated'
         rock.description = description_updated
         rock.update()
-        rock2 = Genre.objects.get(rock.id)
+        rock2 = Genre.objects.get(id=rock.id)
         assert rock2.description == description_updated
         assert 1 == Genre.objects.count()
 
@@ -122,7 +122,7 @@ class TestCaseModel(object):
 
     def test_not_found(self):
         with pytest.raises(NotFoundError) as excinfo:
-            Genre.objects.get(-666)
+            Genre.objects.get(id=-666)
         assert "Object not found" in str(excinfo.value)
 
     def test_encrypted_password(self):
@@ -133,9 +133,19 @@ class TestCaseModel(object):
         # objects needs to dereferenciated otherwise
         # user2 will be just a copy of user
         user = None
-        user2 = User.objects.get(id)
+        user2 = User.objects.get(id=id)
         assert id == user2.id
         assert pwd != user2.password
+
+    def test_get_insert(self):
+        """
+        Testing password field
+        """
+        assert 0 == User.objects.count()
+        user = User(
+            username='username1', email='email1@email.com', password='123')
+        user.add()
+        assert 1 == User.objects.count()
 
     def teardown(self):
         Session.rollback()
