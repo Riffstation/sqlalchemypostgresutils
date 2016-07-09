@@ -20,6 +20,7 @@ class Password(str):
 
     def __new__(cls, value, salt=None, crypt=True):
         value = value.encode('utf-8')
+
         if crypt:
             value = bcrypt.hashpw(value, salt or bcrypt.gensalt(4))
         return value.decode('utf-8')
