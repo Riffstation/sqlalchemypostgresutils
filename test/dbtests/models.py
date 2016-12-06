@@ -1,5 +1,5 @@
 from pgsqlutils.orm import BaseModel
-from pgsqlutils.types import BcryptType
+from pgsqlutils.types import Password
 
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
@@ -8,7 +8,7 @@ from sqlalchemy.orm import relationship
 class User(BaseModel):
     __tablename__ = 'users'
     username = Column(String(64))
-    password = Column(BcryptType)
+    password = Column(Password)
     email = Column(String(64))
 
 

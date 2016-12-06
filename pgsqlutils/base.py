@@ -16,6 +16,7 @@ class DBBorg:
 class DBConf(DBBorg):
     pass
 
+
 conf = DBConf()
 
 

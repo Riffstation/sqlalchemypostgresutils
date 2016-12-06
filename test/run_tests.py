@@ -4,16 +4,22 @@ import os
 import pytest
 import sys
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 sys.path.append(os.path.join(BASE_DIR, '../'))
 
 
 def run_tests():
     from pgsqlutils.base import get_db_conf
-    description = 'Creates play admin user'
+    from pgsqlutils.base import init_db_conn, syncdb
+
+    description = 'execute unit tests'
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument(
         '--config', help='config file path', default='./config/dev.json')
+    parser.add_argument(
+        '--q', help='config file path', required=False,
+        default=os.path.join(BASE_DIR, 'dbtests'))
+
     args = parser.parse_args()
 
     with open(args.config, 'r') as f:
@@ -21,12 +27,14 @@ def run_tests():
 
     dbconf = get_db_conf()
     dbconf.DATABASE_URI = config['DATABASE_URI']
-
-    pytest.main(['-s'])
+    init_db_conn()
+    syncdb()
+    exit(pytest.main(['-s', args.q]))
 
 
 def main():
         run_tests()
+
 
 if __name__ == '__main__':
     main()
