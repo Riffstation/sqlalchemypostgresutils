@@ -30,4 +30,4 @@ class Album(BaseModel):
 class Genre(BaseModel):
     __tablename__ = 'genre'
     name = Column(String(256))
-    description = Column(String(256)) 
+    description = Column(String(256))
