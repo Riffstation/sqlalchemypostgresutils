@@ -1,4 +1,4 @@
-from pgsqlutils.base import init_db_conn, syncdb, Session
+from pgsqlutils.base import Session
 from pgsqlutils.exceptions import NotFoundError
 
 from .models import Artist, Album, Genre, User
@@ -7,9 +7,6 @@ import pytest
 
 
 class TestDB(object):
-    def setup(self):
-        init_db_conn()
-
     def test_connection_open(self):
         """
         checks if connection is open
@@ -20,11 +17,7 @@ class TestDB(object):
 
 
 class TestCaseModel(object):
-    def setup(self):
-        syncdb()
-
     def test_simple_insert(self):
-        syncdb()
         assert 0 == Artist.objects.count()
         artist = Artist()
         artist.add()
@@ -129,13 +122,12 @@ class TestCaseModel(object):
         user = User(username='username', email='eil@il.com', password='123')
         user.add()
         id = user.id
-        pwd = user.password
         # objects needs to dereferenciated otherwise
         # user2 will be just a copy of user
         user = None
         user2 = User.objects.get(id=id)
         assert id == user2.id
-        assert pwd != user2.password
+        assert '123' == user2.password
 
     def test_get_insert(self):
         """

@@ -1,4 +1,4 @@
-from sqlalchemy import String
+from sqlalchemy import Text
 from sqlalchemy.types import TypeDecorator, CHAR
 from sqlalchemy.dialects.postgresql import UUID
 
@@ -6,49 +6,88 @@ import uuid
 import bcrypt
 
 
-class Password(str):
-    """Coerce a string to a bcrypt password.
-
-    Rationale: for an easy string comparison,
-    so we can say ``some_password == 'hello123'``
-
-    .. seealso::
-
-        https://pypi.python.org/pypi/bcrypt/
-
+class PasswordHash(object):
     """
+    http://variable-scope.com/posts/storing-and-verifying-passwords-with-sqlalchemy
+    """
+    def __init__(self, hash_):
+        assert len(hash_) == 60, 'bcrypt hash should be 60 chars.'
 
-    def __new__(cls, value, salt=None, crypt=True):
-        value = value.encode('utf-8')
+        if isinstance(hash_, bytes):
+            self.hash = hash_.decode('utf-8')
+        else:
+            self.hash = hash_
 
-        if crypt:
-            value = bcrypt.hashpw(value, salt or bcrypt.gensalt(4))
-        return value.decode('utf-8')
+        assert self.hash.count('$'), 'bcrypt hash should have 3x "$".'
+        self.rounds = int(self.hash.split('$')[2])
 
-    def __eq__(self, other):
-        if not isinstance(other, Password):
-            other = Password(other, self)
-        return str.__eq__(self, other)
+    def __eq__(self, candidate):
+        """Hashes the candidate string and compares it to the stored hash."""
+        if isinstance(self.hash, str):
+            _hash = self.hash.encode('utf-8')
+        else:
+            _hash = self.hash
+
+        if isinstance(candidate, PasswordHash):
+            candidate = candidate.hash
+
+        if isinstance(candidate, str):
+            candidate = candidate.encode('utf-8')
+
+        return bcrypt.hashpw(candidate, _hash) == _hash
 
     def __ne__(self, other):
         return not self.__eq__(other)
 
+    def __repr__(self):
+        """Simple object representation."""
+        return '<{}>'.format(type(self).__name__)
 
-class BcryptType(TypeDecorator):
-    """Coerce strings to bcrypted Password objects for the database.
-    """
+    @classmethod
+    def new(cls, password, rounds):
+        """Creates a PasswordHash from the given password."""
+        if isinstance(password, str):
+            password = password.encode('utf8')
+        value = bcrypt.hashpw(password, bcrypt.gensalt(rounds))
+        return cls(value)
 
-    impl = String(128)
+
+class Password(TypeDecorator):
+    """Allows storing and retrieving password hashes using PasswordHash."""
+    impl = Text
+
+    def __init__(self, rounds=12, **kwds):
+        self.rounds = rounds
+        super(Password, self).__init__(**kwds)
 
     def process_bind_param(self, value, dialect):
-        return Password(value)
+        """Ensure the value is a PasswordHash and then return its hash."""
+        return self._convert(value).hash
 
     def process_result_value(self, value, dialect):
-        # already crypted, so don't crypt again
-        return Password(value, value, False)
+        """Convert the hash to a PasswordHash, if it's non-NULL."""
+        if value is not None:
+            return PasswordHash(value)
 
-    def __repr__(self):
-        return "BcryptType()"
+    def validator(self, password):
+        """Provides a validator/converter for @validates usage."""
+        return self._convert(password)
+
+    def _convert(self, value):
+        """Returns a PasswordHash from the given string.
+
+        PasswordHash instances or None values will return unchanged.
+        Strings will be hashed and the resulting PasswordHash returned.
+        Any other input will result in a TypeError.
+        """
+        if isinstance(value, PasswordHash):
+            return value
+        elif isinstance(value, str):
+            value = value.encode('utf-8')
+            return PasswordHash.new(value, self.rounds)
+        elif value is not None:
+            raise TypeError(
+                'Cannot convert {} to a PasswordHash'.format(type(value)))
 
 
 class GUID(TypeDecorator):
