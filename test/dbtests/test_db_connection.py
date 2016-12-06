@@ -1,4 +1,4 @@
-from pgsqlutils.base import Session
+from pgsqlutils.base import Session, syncdb
 from pgsqlutils.exceptions import NotFoundError
 
 from .models import Artist, Album, Genre, User
@@ -17,6 +17,9 @@ class TestDB(object):
 
 
 class TestCaseModel(object):
+    def setup(self):
+        syncdb()
+
     def test_simple_insert(self):
         assert 0 == Artist.objects.count()
         artist = Artist()
