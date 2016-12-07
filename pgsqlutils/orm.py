@@ -2,8 +2,10 @@ from sqlalchemy import Column, Integer
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.sql import text
 
-from .base import Base, Session
+from .base import Base
 from .exceptions import NotFoundError, InvalidQueryError
+
+Session = None
 
 
 class BaseManager(object):
