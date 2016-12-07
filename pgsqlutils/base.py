@@ -38,6 +38,24 @@ def init_db_conn():
     global engine
     engine = create_engine(conf.DATABASE_URI)
     Session.configure(bind=engine)
+    from . import orm
+    orm.Session = Session
+
+
+def update_session(session):
+    """
+    A new session can be injected from another source, such a web framework
+    by request, etc.
+    """
+
+    from . import orm
+    global Session
+    Session = session
+    orm.Session = Session
+
+
+def close_session():
+    Session.close_all()
 
 
 def syncdb():
