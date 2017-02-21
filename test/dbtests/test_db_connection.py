@@ -1,4 +1,5 @@
-from pgsqlutils.base import Session, syncdb
+from pgsqlutils.base import syncdb
+from pgsqlutils.orm import Session
 from pgsqlutils.exceptions import NotFoundError
 
 from .models import Artist, Album, Genre, User
