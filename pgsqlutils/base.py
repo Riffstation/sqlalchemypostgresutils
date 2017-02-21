@@ -26,10 +26,8 @@ def get_db_conf():
 
 engine = None
 
-Session = scoped_session(sessionmaker())
 
-
-def init_db_conn():
+def init_db_conn(scopefunc=None):
     """
     Engine and session maker should be global, so there will be attached
     to Borg configuration object
@@ -37,25 +35,11 @@ def init_db_conn():
     conf = get_db_conf()
     global engine
     engine = create_engine(conf.DATABASE_URI)
+    Session = scoped_session(sessionmaker(), scopefunc=scopefunc)
     Session.configure(bind=engine)
     from . import orm
     orm.Session = Session
-
-
-def update_session(session):
-    """
-    A new session can be injected from another source, such a web framework
-    by request, etc.
-    """
-
-    from . import orm
-    global Session
-    Session = session
-    orm.Session = Session
-
-
-def close_session():
-    Session.close_all()
+    return Session
 
 
 def syncdb():
