@@ -70,6 +70,12 @@ class TestCaseModel(object):
         assert rock2.description == description_updated
         assert 1 == Genre.objects.count()
 
+    def test_get_for_update(self):
+        rock = Genre(name='Rock', description='rock yeah!!!')
+        rock.add()
+        rock2 = Genre.objects.get_for_update(id=rock.id)
+        assert rock2.id == rock.id
+
     def test_delete(self):
         rock = Genre(name='Rock', description='rock yeah!!!')
         rock.add()

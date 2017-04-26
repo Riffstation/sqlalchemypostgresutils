@@ -23,6 +23,20 @@ class BaseManager(object):
                 **kwargs
             ).order_by(order_by).limit(limit).offset(offset)
 
+    def get_for_update(self, **kwargs):
+        """
+        http://docs.sqlalchemy.org/en/latest/orm/query.html?highlight=update#sqlalchemy.orm.query.Query.with_for_update  # noqa
+        """
+        if not kwargs:
+            raise InvalidQueryError(
+                "Can not execute a query without parameters")
+        obj = Session.query(
+            self._model).with_for_update(
+                nowait=True, of=self._model).filter_by(**kwargs).first()
+        if not obj:
+            raise NotFoundError('Object not found')
+        return obj
+
     def get(self, **kwargs):
         if not kwargs:
             raise InvalidQueryError(
