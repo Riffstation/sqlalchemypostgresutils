@@ -61,6 +61,9 @@ class BaseManager(object):
     def raw_sql(self, sql, **kwargs):
         return Session.execute(text(sql), kwargs)
 
+    def add_all(self, data):
+        return Session.add_all(data)
+
 
 class BaseModel(Base):
     """Abstract base model, contains common field and methods for all models

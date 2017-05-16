@@ -1,5 +1,5 @@
 from pgsqlutils.base import syncdb
-from pgsqlutils.orm import Session
+from pgsqlutils.orm import Session, BaseModel
 from pgsqlutils.exceptions import NotFoundError
 
 from .models import Artist, Album, Genre, User
@@ -29,6 +29,18 @@ class TestCaseModel(object):
         artist2 = Artist()
         artist2.add()
         assert 2 == Artist.objects.count()
+
+    def test_multi_insert(self):
+        assert 0 == Genre.objects.count()
+        data = [
+            Genre(
+                name='genre{}'.format(x), description='descript{}'.format(x))
+            for x in range(100)
+        ]
+
+        Genre.objects.add_all(data)
+        Session.commit()
+        assert 100 == Genre.objects.count()
 
     def test_relationships(self):
         rock = Genre(name='Rock', description='rock yeah!!!')
@@ -150,5 +162,8 @@ class TestCaseModel(object):
         assert 1 == User.objects.count()
 
     def teardown(self):
-        Session.rollback()
+        for t in reversed(BaseModel.metadata.sorted_tables):
+            sql = 'delete from {} cascade;'.format(t.name)
+            Session.execute(sql)
+        Session.commit()
         Session.close()
